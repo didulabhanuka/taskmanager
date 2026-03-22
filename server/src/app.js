@@ -21,12 +21,8 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', environment: process.env.NODE_ENV });
 });
 
-// Routes — uncomment as we build each one
-// app.use('/api/auth', require('./routes/auth.routes'));
-// app.use('/api/boards', require('./routes/boards.routes'));
-// app.use('/api/columns', require('./routes/columns.routes'));
-// app.use('/api/cards', require('./routes/cards.routes'));
-// app.use('/api/activities', require('./routes/activities.routes'));
+// Routes
+app.use('/api', require('./routes/index'));
 
 // 404 — route not found
 app.use((req, res) => {
