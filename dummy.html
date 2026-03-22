@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Socket Test</title>
+  <script src="http://localhost:4000/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <h2>Socket.io Test</h2>
+  <div id="log"></div>
+  <script>
+    // Paste your token here from the login response
+    const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5YmY3YzRmNTFkZDZhNzA2OGQ5MzZmYiIsImlhdCI6MTc3NDE1NzA2NSwiZXhwIjoxNzc0NzYxODY1fQ.iaxlxqigUN4ahaybeOnhVXtzzOt3IKFybEjQzlUtT5A';
+    const BOARD_ID = '69bf81672300d3fff98bb7d2';
+
+    const log = (msg) => {
+      document.getElementById('log').innerHTML += `<p>${msg}</p>`;
+    };
+
+    const socket = io('http://localhost:4000', {
+      auth: { token: TOKEN }
+    });
+
+    socket.on('connect', () => {
+      log(`Connected: ${socket.id}`);
+      socket.emit('board:join', { boardId: BOARD_ID });
+    });
+
+    socket.on('presence:update', (users) => {
+      log(`Presence update: ${users.map(u => u.name).join(', ')}`);
+    });
+
+    socket.on('card:created', ({ card }) => {
+      log(`Card created: ${card.title}`);
+    });
+
+    socket.on('activity:new', ({ activity }) => {
+      log(`Activity: ${activity.action}`);
+    });
+
+    socket.on('error', (err) => {
+      log(`Error: ${err.message}`);
+    });
+
+    socket.on('disconnect', () => {
+      log('Disconnected');
+    });
+  </script>
+</body>
+</html>

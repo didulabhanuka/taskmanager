@@ -2,11 +2,15 @@ require('dotenv').config();
 const http = require('http');
 const mongoose = require('mongoose');
 const app = require('./app');
+const initSocket = require('./sockets/index');
 
 const PORT = process.env.PORT || 4000;
 
 // Create HTTP server from Express app
 const httpServer = http.createServer(app);
+
+// Attach Socket.io to the HTTP server
+initSocket(httpServer);
 
 // Connect to MongoDB, then start the server
 mongoose

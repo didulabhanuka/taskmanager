@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-
+const { apiLimiter, authLimiter } = require('./middleware/rateLimit/rateLimit.middleware');
 const app = express();
 
 // Allow requests from the React client only
@@ -20,6 +20,10 @@ app.use(express.json({ limit: '10kb' }));
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', environment: process.env.NODE_ENV });
 });
+
+// Rate limiting
+app.use('/api', apiLimiter);
+app.use('/api/auth', authLimiter);
 
 // Routes
 app.use('/api', require('./routes/index'));
