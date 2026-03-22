@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema(
 );
 
 // Generate avatar initials and hash password before saving
+// Generate avatar initials and hash password before saving
 userSchema.pre('save', async function () {
   if (this.isModified('name') || this.isNew) {
     this.avatar = this.name
@@ -42,10 +43,11 @@ userSchema.pre('save', async function () {
   }
 
   if (this.isModified('passwordHash')) {
-    this.passwordHash = await bcrypt.hash(this.passwordHash, 12);
+    // Use 1 round in test env — 12 rounds is too slow for tests
+    const bcryptRounds = process.env.NODE_ENV === 'test' ? 1 : 12;
+    this.passwordHash = await bcrypt.hash(this.passwordHash, bcryptRounds);
   }
 });
-
 // Compare entered password with stored hash
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.passwordHash);
