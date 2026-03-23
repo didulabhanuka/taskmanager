@@ -7,6 +7,8 @@ import Board from '../components/Board/Board';
 import ActivityFeed from '../components/ActivityFeed/ActivityFeed';
 import PresenceBar from '../components/Presence/PresenceBar';
 import UserCursor from '../components/Presence/UserCursor';
+import AddMember from '../components/Board/AddMember';
+import BoardInfo from '../components/Board/BoardInfo';
 
 const boardPageStyles = `
   .bp-root {
@@ -64,25 +66,6 @@ const boardPageStyles = `
     font-size: 16px;
     margin: 0 6px;
     user-select: none;
-  }
-
-  .bp-board-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-1);
-    letter-spacing: -0.2px;
-    max-width: 260px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .bp-board-title-skeleton {
-    width: 110px;
-    height: 13px;
-    border-radius: 4px;
-    background: var(--surface-3);
-    animation: pulse 1.5s ease infinite;
   }
 
   .bp-nav-right {
@@ -395,11 +378,20 @@ const AddColumnButton = ({ boardId }) => {
 
 /* ── BoardContent ── */
 const BoardContent = ({ boardId }) => {
-  const { state, onlineUsers, cursors, socketRef } = useBoard();
+  const { state, onlineUsers, cursors, socketRef, dispatch } = useBoard();
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [showActivity, setShowActivity] = useState(false);
   const boardAreaRef = useRef(null);
+
+  // Update board state when members change
+  const handleBoardUpdate = (updatedBoard) => {
+    dispatch({ type: 'BOARD_LOADED', payload: {
+      board: updatedBoard,
+      columns: Object.values(state.columns),
+      cards: Object.values(state.cards),
+    }});
+  };
 
   // Throttled cursor emit — 50ms = 20fps, prevents socket spam
   const emitCursor = useCallback(
@@ -432,14 +424,13 @@ const BoardContent = ({ boardId }) => {
             Boards
           </button>
           <span className="bp-breadcrumb-sep">/</span>
-          {state.board?.title
-            ? <h1 className="bp-board-title">{state.board.title}</h1>
-            : <div className="bp-board-title-skeleton" />
-          }
+          <BoardInfo board={state.board} onUpdate={handleBoardUpdate} />
         </div>
 
         <div className="bp-nav-right">
           <PresenceBar users={onlineUsers} />
+
+          <AddMember board={state.board} onUpdate={handleBoardUpdate} />
 
           <button
             className={`bp-activity-btn ${showActivity ? 'active' : ''}`}

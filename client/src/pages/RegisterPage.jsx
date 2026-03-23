@@ -511,7 +511,7 @@ const RegisterPage = () => {
           </p>
 
           <div className="auth-brand">
-            <span className="auth-brand-name">TaskManager</span>
+            <span className="auth-brand-name">Flowboard</span>
           </div>
         </div>
       </div>
